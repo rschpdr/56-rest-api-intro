@@ -6,11 +6,29 @@ const SALT_ROUNDS = 10;
 const UserModel = require("../models/User.model");
 const generateToken = require("../config/jwt.config");
 
+// Importando a instância do multer que é responsável por fazer o upload dos arquivos
+const uploader = require("../config/cloudinary.config");
+
 // CRUD de projeto
+
+// Rota para upload de arquivo
+router.post(
+  "/image-upload",
+  uploader.single("profilePicture"),
+  (req, res, next) => {
+    if (!req.file) {
+      return next(new Error("Upload não conseguiu ser finalizado"));
+    }
+
+    console.log(req.file);
+
+    return res.status(201).json({ url: req.file.path });
+  }
+);
 
 // Definindo nossos route listeners
 router.post("/signup", (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, pictureUrl } = req.body;
 
   // Verifica se a senha recebida é fraca
   if (
@@ -30,7 +48,7 @@ router.post("/signup", (req, res, next) => {
   const passwordHash = bcrypt.hashSync(password, salt);
 
   // Inserir o usuário no banco
-  UserModel.create({ name, email, passwordHash })
+  UserModel.create({ name, email, passwordHash, pictureUrl })
     .then((result) => {
       const { name, email, _id } = result;
       return res.status(201).json({ name, email, _id });
@@ -58,8 +76,10 @@ router.post("/login", (req, res, next) => {
         // Gerar e assinar um token JWT para o usuário logado
         const token = generateToken(result);
         // Efetivar o login do usuário
-        const { _id, name, email } = result;
-        return res.status(200).json({ token, user: { _id, name, email } });
+        const { _id, name, email, pictureUrl } = result;
+        return res
+          .status(200)
+          .json({ token, user: { _id, name, email, pictureUrl } });
       } else {
         return res.status(400).json({ msg: "E-mail ou senha errado" });
       }
