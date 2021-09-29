@@ -16,6 +16,8 @@ router.post(
   "/image-upload",
   uploader.single("profilePicture"),
   (req, res, next) => {
+    console.log(process.env.REACT_APP_URL);
+
     if (!req.file) {
       return next(new Error("Upload não conseguiu ser finalizado"));
     }
