@@ -4,7 +4,6 @@ const express = require("express");
 
 const initDb = require("./config/db.config");
 
-const PORT = 4000;
 const API_VERSION = 1;
 
 const app = express();
@@ -12,7 +11,7 @@ const app = express();
 // Configurando o express para aceitar requisições com o body no formato JSON
 app.use(express.json());
 // Configurando o express para aceitar requisições deste domínio (nosso App React)
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: process.env.REACT_APP_URL }));
 
 const projectRouter = require("./routes/project.routes");
 // Redirecionando todas as requisições para os roteadores
@@ -38,7 +37,9 @@ app.use((err, req, res, next) => {
 initDb
   .then(() => {
     // Só subimos o servidor do Express depois que a conexão com o banco foi bem-sucedida
-    app.listen(PORT, () => console.log(`Servidor escutando na porta ${PORT}`));
+    app.listen(process.env.PORT, () =>
+      console.log(`Servidor escutando na porta ${process.env.PORT}`)
+    );
   })
   .catch((err) => {
     console.error("Erro de conexão com o MongoDB: ", err);
