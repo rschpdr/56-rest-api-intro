@@ -37,7 +37,7 @@ app.use((err, req, res, next) => {
 initDb
   .then(() => {
     // Só subimos o servidor do Express depois que a conexão com o banco foi bem-sucedida
-    app.listen(process.env.PORT, () =>
+    app.listen(Number(process.env.PORT), () =>
       console.log(`Servidor escutando na porta ${process.env.PORT}`)
     );
   })
