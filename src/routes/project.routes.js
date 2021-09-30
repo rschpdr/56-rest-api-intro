@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const ProjectModel = require("../models/Project.model");
+const TaskModel = require("../models/Task.model");
 // Importando a definição de tipo dos _ids do Mongo
 const { ObjectId } = require("mongoose").Types;
 
@@ -16,7 +17,7 @@ router.post("/project", isAuthenticated, (req, res, next) => {
   console.log(req.body);
 
   // Inserindo os dados no banco
-  ProjectModel.create({ ...req.body, projectOwner: req.user._id })
+  ProjectModel.create({ ...req.body, projectOwner: req.user._id }) // req.user é um objeto criado pelo middleware isAuthenticated e o nome 'user' é definido pela chave "userProperty"
     .then((result) => {
       // Result vai ser o objeto criado no MongoDB
       return res.status(201).json(result);
@@ -87,8 +88,12 @@ router.delete("/project/:id", (req, res, next) => {
         return res.status(404).json({ msg: "Projeto não encontrado" });
       }
 
+      // Deletar todas as tarefas relacionadas à esse projeto
+      TaskModel.deleteMany({ projectId: ObjectId(req.params.id) })
+        // Por convenção do HTTP, devemos retornar um objeto vazio no sucesso da deleção
+        .then(() => res.status(200).json({}));
+
       // Por convenção do HTTP, devemos retornar um objeto vazio no sucesso da deleção
-      return res.status(200).json({});
     })
     .catch((err) => next(err));
 });
