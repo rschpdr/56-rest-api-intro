@@ -18,7 +18,6 @@ router.post(
   "/project",
   isAuthenticated,
   attachCurrentUser,
-  isAdmin,
   (req, res, next) => {
     // Os dados enviados pelo cliente (pode ser o Insomnia ou o Axios no React) estarão no objeto req.body
     console.log(req.body);
