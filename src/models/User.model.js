@@ -11,6 +11,12 @@ const userSchema = new Schema({
   passwordHash: { type: String, required: true },
   name: { type: String, required: true, trim: true },
   pictureUrl: { type: String, trim: true },
+  role: {
+    type: String,
+    enum: ["ADMIN", "USER"],
+    required: true,
+    default: "USER",
+  },
 });
 
 module.exports = model("User", userSchema);

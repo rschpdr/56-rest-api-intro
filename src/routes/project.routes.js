@@ -6,25 +6,33 @@ const TaskModel = require("../models/Task.model");
 const { ObjectId } = require("mongoose").Types;
 
 const isAuthenticated = require("../middlewares/isAuthenticated");
+const attachCurrentUser = require("../middlewares/attachCurrentUser");
+const isAdmin = require("../middlewares/isAdmin");
 
 // CRUD de projeto
 
 // Definindo nossos route listeners
 
 // Crud (Create) => POST
-router.post("/project", isAuthenticated, (req, res, next) => {
-  // Os dados enviados pelo cliente (pode ser o Insomnia ou o Axios no React) estarão no objeto req.body
-  console.log(req.body);
+router.post(
+  "/project",
+  isAuthenticated,
+  attachCurrentUser,
+  isAdmin,
+  (req, res, next) => {
+    // Os dados enviados pelo cliente (pode ser o Insomnia ou o Axios no React) estarão no objeto req.body
+    console.log(req.body);
 
-  // Inserindo os dados no banco
-  ProjectModel.create({ ...req.body, projectOwner: req.user._id }) // req.user é um objeto criado pelo middleware isAuthenticated e o nome 'user' é definido pela chave "userProperty"
-    .then((result) => {
-      // Result vai ser o objeto criado no MongoDB
-      return res.status(201).json(result);
-    })
-    // Repassando o erro para o route listener de captura de erros padrão
-    .catch((err) => next(err));
-});
+    // Inserindo os dados no banco
+    ProjectModel.create({ ...req.body, projectOwner: req.user._id }) // req.user é um objeto criado pelo middleware isAuthenticated e o nome 'user' é definido pela chave "userProperty"
+      .then((result) => {
+        // Result vai ser o objeto criado no MongoDB
+        return res.status(201).json(result);
+      })
+      // Repassando o erro para o route listener de captura de erros padrão
+      .catch((err) => next(err));
+  }
+);
 
 // cRud (Read) => GET (Lista)
 router.get("/project", isAuthenticated, (req, res, next) => {
